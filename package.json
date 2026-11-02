@@ -1,0 +1,25 @@
+{
+  "name": "slidecold-node-monorepo",
+  "private": true,
+  "license": "MIT",
+  "workspaces": [
+    "packages/slidecold",
+    "packages/slidecold-mcp"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "generate": "node scripts/generate.mjs",
+    "build": "npm run build --workspaces",
+    "typecheck": "npm run typecheck --workspaces",
+    "test": "npm test --workspaces"
+  },
+  "devDependencies": {
+    "@types/node": "20.19.9",
+    "openapi-typescript": "7.13.0",
+    "tsup": "8.5.1",
+    "typescript": "5.9.3",
+    "yaml": "2.9.1"
+  }
+}

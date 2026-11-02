@@ -1,0 +1,43 @@
+{
+  "name": "slidecold-mcp",
+  "version": "0.1.0",
+  "description": "Official SlideCold MCP server: every SlideCold API operation as an MCP tool.",
+  "license": "MIT",
+  "author": "SlideCold",
+  "homepage": "https://github.com/slidecold/slidecold-node#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slidecold/slidecold-node.git",
+    "directory": "packages/slidecold-mcp"
+  },
+  "bugs": "https://github.com/slidecold/slidecold-node/issues",
+  "keywords": ["slidecold", "mcp", "model-context-protocol", "instagram", "claude"],
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "slidecold-mcp": "dist/bin.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.2",
+    "slidecold": "0.1.0"
+  }
+}
