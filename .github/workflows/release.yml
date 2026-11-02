@@ -19,28 +19,16 @@ jobs:
           cache: npm
           registry-url: https://registry.npmjs.org
       - run: npm ci
-      - name: Tag matches both package versions
+      - name: Tag matches package version
         run: |
-          node -e '
-            const v = process.env.GITHUB_REF_NAME.replace(/^v/, "");
-            const sdk = require("./packages/slidecold/package.json");
-            const mcp = require("./packages/slidecold-mcp/package.json");
-            const dep = mcp.dependencies.slidecold;
-            if (sdk.version !== v || mcp.version !== v || dep !== v) {
-              console.error(`tag ${v}, slidecold ${sdk.version}, slidecold-mcp ${mcp.version} (depends on slidecold ${dep})`);
-              process.exit(1);
-            }'
+          v="$(node -p 'require("./package.json").version')"
+          if [ "v$v" != "$GITHUB_REF_NAME" ]; then echo "tag $GITHUB_REF_NAME does not match package.json version $v"; exit 1; fi
       - name: Generated code is up to date
         run: npm run generate && git diff --exit-code
       - run: npm run build
       - run: npm run typecheck
       - run: npm test
-      - name: Publish slidecold
-        run: npm publish --provenance --access public --workspace slidecold
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Publish slidecold-mcp
-        run: npm publish --provenance --access public --workspace slidecold-mcp
+      - run: npm publish --provenance --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Create GitHub release

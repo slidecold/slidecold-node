@@ -9,7 +9,7 @@ export interface ConfigFile {
   baseUrl?: string;
 }
 
-/** Path of the shared SlideCold config file used by the SDK, CLI and MCP server. */
+/** Path of the shared SlideCold config file used by the SDK, the slidecold CLI and the MCP server. */
 export function configPath(env: NodeJS.ProcessEnv = process.env): string {
   if (process.platform === 'win32') {
     return join(env.APPDATA || join(homedir(), 'AppData', 'Roaming'), 'slidecold', 'config.json');

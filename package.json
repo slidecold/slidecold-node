@@ -1,19 +1,46 @@
 {
-  "name": "slidecold-node-monorepo",
-  "private": true,
+  "name": "slidecold",
+  "version": "0.2.0",
+  "description": "Official SlideCold Node.js SDK for the SlideCold Instagram cold-DM API.",
   "license": "MIT",
-  "workspaces": [
-    "packages/slidecold",
-    "packages/slidecold-mcp"
-  ],
+  "author": "SlideCold",
+  "homepage": "https://github.com/slidecold/slidecold-node#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/slidecold/slidecold-node.git"
+  },
+  "bugs": "https://github.com/slidecold/slidecold-node/issues",
+  "keywords": ["slidecold", "instagram", "dm", "outreach", "sdk", "api"],
+  "type": "module",
   "engines": {
     "node": ">=18"
   },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
   "scripts": {
     "generate": "node scripts/generate.mjs",
-    "build": "npm run build --workspaces",
-    "typecheck": "npm run typecheck --workspaces",
-    "test": "npm test --workspaces"
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test test/*.test.mjs",
+    "prepublishOnly": "npm run build"
   },
   "devDependencies": {
     "@types/node": "20.19.9",

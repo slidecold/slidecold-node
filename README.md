@@ -1,19 +1,16 @@
-# SlideCold for Node.js
+# slidecold
 
-Official Node.js tools for the [SlideCold](https://slidecold.com) API (Instagram cold-DM outreach):
+Official Node.js SDK for the [SlideCold](https://slidecold.com) API (Instagram cold-DM outreach). Every request and response is typed from [`openapi.yaml`](openapi.yaml), covering all 49 operations. Zero runtime dependencies, Node.js 18 or newer.
 
-| Package | What it is |
-| --- | --- |
-| [`slidecold`](packages/slidecold) | Typed SDK and the `slidecold` CLI. Zero runtime dependencies. |
-| [`slidecold-mcp`](packages/slidecold-mcp) | MCP server that gives Claude, Cursor and other MCP clients every API operation as a tool. |
+Looking for something else?
 
-Everything is generated from [`openapi.yaml`](openapi.yaml), so the SDK, CLI and MCP server always cover the same 49 operations. Node.js 18 or newer.
+- **CLI**: [slidecold/slidecold-cli](https://github.com/slidecold/slidecold-cli) (`slidecold login`, `slidecold campaigns list`, ...)
+- **MCP server** for Claude, Cursor and other MCP clients: [slidecold/slidecold-mcp](https://github.com/slidecold/slidecold-mcp)
 
 ## Install
 
 ```sh
-npm install slidecold          # SDK (+ CLI via npx slidecold)
-npm install -g slidecold       # CLI on your PATH
+npm install slidecold
 ```
 
 Create an API key (`cs_...`) at <https://slidecold.com/settings>.
@@ -51,66 +48,16 @@ Methods are grouped by resource (`campaigns`, `audiences`, `conversations`, `acc
 | `timeoutMs` | `30000` |
 | `maxRetries` | `2` (GET only, on 429, 5xx and network errors, with exponential backoff) |
 
-The config file is shared by the SDK, CLI and MCP server and is written by `slidecold login`:
+The config file is shared with the [SlideCold CLI](https://github.com/slidecold/slidecold-cli) and the [MCP server](https://github.com/slidecold/slidecold-mcp), and is written by the CLI's `slidecold login`:
 `$XDG_CONFIG_HOME/slidecold/config.json` (default `~/.config/slidecold/config.json`), or `%APPDATA%\slidecold\config.json` on Windows.
 
 ```json
 { "apiKey": "cs_...", "baseUrl": "https://slidecold.com/api/v1" }
 ```
 
-## CLI quickstart
-
-```sh
-slidecold login                                   # prompts for the key, validates it, saves it (0600)
-slidecold campaigns list
-slidecold campaigns list --archived true
-slidecold campaigns stats cmp_123
-slidecold campaigns update cmp_123 --name "Q4 push" --dailyLimit 40
-slidecold campaigns create --data @campaign.json
-slidecold accounts login-status --jobId job_1
-slidecold audiences export aud_1 > members.csv
-slidecold audiences import-members aud_1 --file members.csv
-slidecold conversations send-photo conv_1 --file pic.jpg
-slidecold conversations delete-message conv_1 msg_9
-slidecold campaigns create --help                 # params, body fields, scope, endpoint
-slidecold help
-```
-
-Shape: `slidecold <resource> <action> [ids...] [--param value ...] [--data '<json>' | --data @file.json] [--file path]`.
-Path ids are positional; query parameters and top-level body fields are `--flags` (`--job-id` works too); `--data` is merged under the flags.
-Output is pretty JSON on stdout (raw CSV for exports). Errors go to stderr with exit code 1. `--api-key` and `--base-url` override the environment and config file. `slidecold logout` deletes the config file.
-
-## MCP server
-
-`slidecold-mcp` is a stdio MCP server with one tool per operation (49 tools, e.g. `list_campaigns`, `get_campaign_stats`, `send_conversation_reply`). Tool descriptions include the required scope; read-only, destructive and idempotent operations are annotated. Uploads take a local `file_path`. It reads the API key the same way as the SDK (`SLIDECOLD_API_KEY`, then the config file from `slidecold login`).
-
-**Claude Code**
-
-```sh
-claude mcp add slidecold -e SLIDECOLD_API_KEY=cs_... -- npx -y slidecold-mcp
-```
-
-**Claude Desktop** (`claude_desktop_config.json`)
-
-```json
-{
-  "mcpServers": {
-    "slidecold": {
-      "command": "npx",
-      "args": ["-y", "slidecold-mcp"],
-      "env": { "SLIDECOLD_API_KEY": "cs_..." }
-    }
-  }
-}
-```
-
-**Cursor** (`~/.cursor/mcp.json` or `.cursor/mcp.json` in a project): the same `mcpServers` JSON as Claude Desktop.
-
-Give the MCP server a key with only the scopes you want an assistant to have. A read-only key (`*:read`) is a good start.
-
 ## Scopes
 
-Each API key carries scopes `<resource>:<read|write>` for `accounts`, `audiences`, `campaigns` and `conversations`; `:write` also grants `:read`. Proxies use the `accounts` scopes; folders use the scope of their folder type. Each SDK method's doc comment, `slidecold <resource> <action> --help` and each MCP tool description show the scope it needs. A missing scope returns 403 (`PermissionError`) with a message such as `This API key is missing the campaigns:write scope`.
+Each API key carries scopes `<resource>:<read|write>` for `accounts`, `audiences`, `campaigns` and `conversations`; `:write` also grants `:read`. Proxies use the `accounts` scopes; folders use the scope of their folder type. Each SDK method's doc comment shows the scope it needs. A missing scope returns 403 (`PermissionError`) with a message such as `This API key is missing the campaigns:write scope`.
 
 ## Error handling
 
@@ -154,13 +101,13 @@ The comparison is constant time.
 
 ```sh
 npm ci
-npm run generate   # regenerate packages/slidecold/src/generated from openapi.yaml
+npm run generate   # regenerate src/generated from openapi.yaml
 npm run build
 npm run typecheck
 npm test
 ```
 
-Generated code is committed; CI fails if it is stale. Releases are cut by pushing a `vX.Y.Z` tag after bumping both package versions (and `slidecold-mcp`'s dependency on `slidecold`) together.
+Generated code is committed; CI fails if it is stale. Releases are cut by bumping `version` in `package.json`, adding a CHANGELOG entry and pushing a matching `vX.Y.Z` tag; CI tests, publishes to npm with provenance and creates the GitHub release.
 
 ## License
 
